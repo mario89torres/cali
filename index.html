@@ -165,7 +165,8 @@
             font-size: 0.9em;
             color: var(--dark-text);
         }
-        .input-group input[type="text"] {
+        .input-group input[type="text"],
+        .input-group select {
             padding: 12px;
             border: 1px solid var(--dark-border);
             border-radius: 8px;
@@ -174,6 +175,14 @@
             box-sizing: border-box;
             background-color: var(--dark-input-bg);
             color: var(--dark-text);
+            -webkit-appearance: none; 
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23b0b0b0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.6-3.6%205.4-7.9%205.4-12.9%200-5-1.8-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 0.65em auto;
+            padding-right: 2.5rem;
         }
         
         /* Botones Generales */
@@ -194,6 +203,13 @@
         .btn-primario:hover { background-color: #004d7a; transform: translateY(-1px); }
         .btn-exito { background-color: var(--innova-green); }
         .btn-exito:hover { background-color: #4a8c36; transform: translateY(-1px); }
+        .btn-secundario {
+            background-color: var(--innova-orange);
+            margin-top: 0;
+            padding: 10px;
+            font-size: 0.9em;
+        }
+        .btn-secundario:hover { background-color: #d9791a; }
         .btn:disabled {
             background-color: #55557a;
             opacity: 0.7;
@@ -201,7 +217,20 @@
             transform: none;
         }
         
-        /* Lista de Resultados */
+        /* Mini-formulario "Nueva Actividad" */
+        #nueva-actividad-form {
+            display: none;
+            background: var(--dark-input-bg);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            border: 1px solid var(--dark-border);
+        }
+        #nueva-actividad-form .btn { font-size: 1em; padding: 12px; }
+        #nueva-actividad-form .btn-cancelar { background-color: #555; }
+        
+        /* Lista de Resultados de Búsqueda */
         #lista-resultados {
             list-style: none;
             padding: 0;
@@ -266,10 +295,55 @@
             color: var(--innova-orange);
             font-weight: bold;
         }
+        
+        /* Tabla de Reporte */
+        #reporte-grupo-output {
+            margin-top: 20px;
+            width: 100%;
+            overflow-x: auto;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+        .report-table th, .report-table td {
+            border: 1px solid var(--dark-border);
+            padding: 12px 15px;
+            text-align: left;
+        }
+        .report-table th {
+            background-color: var(--dark-input-bg);
+            color: var(--innova-orange);
+            font-size: 1em;
+        }
+        .report-table tr:nth-child(even) {
+            background-color: #2f2f52;
+        }
+        .report-table td:first-child {
+            font-weight: 600;
+        }
+        .report-table .count-cell {
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        /* NUEVO: Estilo para la celda de promedio */
+        .report-table .promedio-cell {
+            text-align: center;
+            font-weight: bold;
+            color: var(--dark-text);
+            font-size: 1.05em;
+        }
     </style>
 </head>
 <body>
 
+    <!-- 
+      =====================================================
+      PANEL DE LOGIN (Usuario/Contraseña)
+      =====================================================
+    -->
     <div id="login-container">
         <h1>Innova Schools</h1>
         <p style="color: var(--dark-subtext);">Inicia sesión para continuar</p>
@@ -283,9 +357,15 @@
         <div id="login-error"></div>
     </div>
 
+    <!-- 
+      =====================================================
+      CONTENEDOR DE APP (Oculto hasta el login)
+      =====================================================
+    -->
     <div id="app-wrapper">
         <div id="app-container">
             
+            <!-- Encabezado de Usuario Logueado -->
             <div id="user-info-header">
                 <span id="user-display-name">Cargando...</span>
                 <button id="btn-logout">Cerrar Sesión</button>
@@ -293,26 +373,35 @@
             
             <h1>Innova Schools Ojo de Agua</h1>
     
+            <!-- 
+              PANEL 1: BÚSQUEDA Y REGISTRO
+            -->
             <div id="panel-busqueda" class="panel">
                 <h2>Gestión de Alumnos</h2>
                 <div class="input-group">
-                    <label for="buscar-grupo">ID del Grupo:</label>
+                    <label for="buscar-grupo">ID del Grupo (para evaluar y registrar):</label>
                     <input type="text" id="buscar-grupo" value="primero_a_2025">
                 </div>
                 <form id="form-busqueda">
                     <div class="input-group">
-                        <label for="buscar-nombre">Buscar por Nombre:</label>
+                        <label for="buscar-nombre">Buscar Alumno por Nombre:</label>
                         <input type="text" id="buscar-nombre" placeholder="Escribe el nombre del alumno...">
                     </div>
                     <button type="submit" class="btn btn-primario" id="btn-buscar">Buscar Alumnos</button>
                 </form>
                 <button class="btn btn-exito" id="btn-ir-a-registrar">Registrar Nuevo Alumno</button>
-                <h3>Resultados:</h3>
+                
+                <button type="button" class="btn btn-secundario" id="btn-ir-a-reporte" style="margin-top: 20px;">Ver Reporte General por Grupo</button>
+                
+                <h3>Resultados de Búsqueda:</h3>
                 <ul id="lista-resultados">
                     <li>Busca un grupo para ver los alumnos...</li>
                 </ul>
             </div>
     
+            <!-- 
+              PANEL 2: REGISTRO DE NUEVO ALUMNO
+            -->
             <div id="panel-registro" class="panel">
                 <h2>Registrar Nuevo Alumno</h2>
                 <form id="form-registro">
@@ -333,23 +422,38 @@
                 </form>
             </div>
     
+            <!-- 
+              PANEL 3: EVALUACIÓN DE ALUMNO
+            -->
             <div id="panel-evaluacion" class="panel">
                 <h2>Evaluando a: <span id="nombre-alumno-evaluando">...</span></h2>
                 <button class="btn btn-primario" id="btn-volver-a-busqueda">Volver a Búsqueda</button>
                 <form id="rubrica-form">
                     <h3>Nueva Actividad</h3>
                     <div class="input-group">
-                        <label for="actividad-nombre">Nombre de la Actividad:</label>
-                        <input type="text" id="actividad-nombre" placeholder="Ej: Mapa Mental de la Célula" required>
+                        <label for="actividad-select">Nombre de la Actividad:</label>
+                        <select id="actividad-select" required>
+                            <option value="" disabled selected>-- Primero busca un grupo --</option>
+                        </select>
                     </div>
-                    <h4>Rúbrica 1: Calidad de Investigación</h4>
+                    <button type="button" id="btn-nueva-actividad-mostrar" class="btn btn-secundario">+ Registrar Nueva Actividad al Banco</button>
+                    <div id="nueva-actividad-form">
+                        <h4>Registrar Actividad en Banco</h4>
+                        <div class="input-group">
+                            <label for="nueva-actividad-nombre">Nombre:</label>
+                            <input type="text" id="nueva-actividad-nombre" placeholder="Ej: Ensayo sobre la Célula">
+                        </div>
+                        <button type="button" id="btn-nueva-actividad-guardar" class="btn btn-exito">Guardar y Seleccionar</button>
+                        <button type="button" id="btn-nueva-actividad-cancelar" class="btn btn-primario btn-cancelar">Cancelar</button>
+                    </div>
+                    <h4 style="margin-top: 20px;">Rúbrica 1: Calidad de Investigación</h4>
                     <div class="botones-grid" id="grid-investigacion">
                         <button type="button" class="btn-nivel btn-excelente" data-valor="Excelente">Excelente</button>
                         <button type="button" class="btn-nivel btn-satisfatorio" data-valor="Satisfactorio">Satisfactorio</button>
                         <button type="button" class="btn-nivel btn-suficiente" data-valor="Suficiente">Suficiente</button>
                         <button type="button" class="btn-nivel btn-insatisfactorio" data-valor="Insatisfactorio">Insatisfactorio</button>
                     </div>
-                    <button type="submit" class="btn btn-exito" id="btn-guardar-actividad" disabled>Guardar Actividad</button>
+                    <button type="submit" class="btn btn-exito" id="btn-guardar-actividad" disabled>Guardar Evaluación del Alumno</button>
                 </form>
                 <div id="concentrado-area">
                     <h2>Concentrado del Alumno</h2>
@@ -358,18 +462,43 @@
                     <pre id="retro-output">Aquí se generará la retroalimentación...</pre>
                 </div>
             </div>
+            
+            <!-- 
+              PANEL 4: REPORTE DE GRUPO
+            -->
+            <div id="panel-reporte-grupo" class="panel">
+                <h2>Reporte General por Grupo</h2>
+                <button class="btn btn-primario" id="btn-volver-a-busqueda-reporte">Volver a Gestión</button>
+                
+                <div class="input-group" style="margin-top: 20px;">
+                    <label for="grupo-reporte-select">Selecciona un Grupo:</label>
+                    <select id="grupo-reporte-select">
+                        <option value="" disabled selected>-- Cargando grupos... --</option>
+                    </select>
+                </div>
+                
+                <div id="reporte-grupo-output">
+                    <p style="color: var(--dark-subtext); text-align: center;">Selecciona un grupo para generar el reporte.</p>
+                </div>
+            </div>
+            
         </div>
     </div>
 
+
+    <!-- 
+      =====================================================
+      SECCIÓN DE LÓGICA (JAVASCRIPT) - CÓDIGO COMPLETO
+      =====================================================
+    -->
     <script type="module">
         // --- 1. IMPORTACIONES ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        // Importaciones de Firestore (Base de Datos)
         import { 
             getFirestore, collection, doc, addDoc, getDocs, 
-            query, orderBy, serverTimestamp, where 
+            query, orderBy, serverTimestamp, where,
+            setDoc 
         } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-        // Importaciones de Auth (Autenticación)
         import { 
             getAuth, 
             signInWithEmailAndPassword,
@@ -378,8 +507,6 @@
         } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 
         // --- 2. CONFIGURACIÓN DE FIREBASE ---
-        // ¡¡¡ ATENCIÓN !!!
-        // ¡REEMPLAZA ESTA CLAVE CON LA NUEVA QUE GENERASTE!
         const firebaseConfig = {
           apiKey: "AIzaSyC_NbLtbrbs_t1GWkbnG382KkLc7I1_x5M", // <-- ¡¡¡REEMPLAZA ESTO!!!
           authDomain: "calificaciones-8911e.firebaseapp.com",
@@ -400,90 +527,89 @@
         let valorSeleccionado = null; 
         let estaGuardando = false; 
 
+        // ¡NUEVO! Mapa de calificaciones
+        const NIVEL_A_PORCENTAJE = {
+            "Excelente": 100,
+            "Satisfactorio": 85,
+            "Suficiente": 70,
+            "Insatisfactorio": 50
+        };
+
         // --- 5. REFERENCIAS A ELEMENTOS DEL DOM ---
-        // Referencias de Login y App
+        // Login y App
         const loginContainer = document.getElementById('login-container');
         const appWrapper = document.getElementById('app-wrapper');
         const btnLogout = document.getElementById('btn-logout');
         const userDisplayName = document.getElementById('user-display-name');
-        
-        // Referencias al formulario de Login
         const loginForm = document.getElementById('login-form');
         const loginEmail = document.getElementById('login-email');
         const loginPassword = document.getElementById('login-password');
         const btnLogin = document.getElementById('btn-login');
         const loginError = document.getElementById('login-error');
-
-        // Referencias a Paneles
+        // Paneles
         const panelBusqueda = document.getElementById('panel-busqueda');
         const panelRegistro = document.getElementById('panel-registro');
         const panelEvaluacion = document.getElementById('panel-evaluacion');
-        
-        // Referencias de Búsqueda
+        const panelReporteGrupo = document.getElementById('panel-reporte-grupo');
+        // Búsqueda
         const formBusqueda = document.getElementById('form-busqueda');
         const inputBuscarGrupo = document.getElementById('buscar-grupo');
         const inputBuscarNombre = document.getElementById('buscar-nombre');
         const btnBuscar = document.getElementById('btn-buscar');
         const btnIrARegistrar = document.getElementById('btn-ir-a-registrar');
         const listaResultados = document.getElementById('lista-resultados');
-        
-        // Referencias de Registro
+        const btnIrAReporte = document.getElementById('btn-ir-a-reporte');
+        // Registro
         const formRegistro = document.getElementById('form-registro');
         const inputRegGrupo = document.getElementById('reg-grupo');
         const inputRegNombre = document.getElementById('reg-nombre');
         const inputRegApellido = document.getElementById('reg-apellido');
         const btnGuardarAlumno = document.getElementById('btn-guardar-alumno');
         const btnCancelarRegistro = document.getElementById('btn-cancelar-registro');
-        
-        // Referencias de Evaluación
+        // Evaluación
         const btnVolverABusqueda = document.getElementById('btn-volver-a-busqueda');
         const nombreAlumnoEvaluando = document.getElementById('nombre-alumno-evaluando');
         const formRubrica = document.getElementById('rubrica-form');
-        const inputActividadNombre = document.getElementById('actividad-nombre');
         const gridInvestigacion = document.getElementById('grid-investigacion');
         const btnGuardarActividad = document.getElementById('btn-guardar-actividad');
         const concentradoOutput = document.getElementById('concentrado-output');
         const retroOutput = document.getElementById('retro-output');
-
+        const actividadSelect = document.getElementById('actividad-select');
+        const btnNuevaActividadMostrar = document.getElementById('btn-nueva-actividad-mostrar');
+        const nuevaActividadForm = document.getElementById('nueva-actividad-form');
+        const nuevaActividadNombre = document.getElementById('nueva-actividad-nombre');
+        const btnNuevaActividadGuardar = document.getElementById('btn-nueva-actividad-guardar');
+        const btnNuevaActividadCancelar = document.getElementById('btn-nueva-actividad-cancelar');
+        // Reporte de Grupo
+        const btnVolverABusquedaReporte = document.getElementById('btn-volver-a-busqueda-reporte');
+        const grupoReporteSelect = document.getElementById('grupo-reporte-select');
+        const reporteGrupoOutput = document.getElementById('reporte-grupo-output');
+        
 
         // --- 6. LÓGICA CENTRAL DE AUTENTICACIÓN ---
-
-        /**
-         * El "Guardián" de la aplicación.
-         */
+        
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Usuario está LOGUEADO
                 loginContainer.style.display = 'none';
                 appWrapper.style.display = 'block';
                 userDisplayName.textContent = `Bienvenido, ${user.displayName || user.email}`; 
                 mostrarPanel('busqueda');
                 loginError.style.display = 'none';
-
+                cargarTodosLosGrupos();
             } else {
-                // Usuario está NO LOGUEADO
                 loginContainer.style.display = 'block';
                 appWrapper.style.display = 'none';
                 alumnoActual = null;
             }
         });
 
-        /**
-         * Inicia sesión con Email y Contraseña
-         */
         async function signInWithEmail(e) {
             e.preventDefault(); 
             btnLogin.disabled = true;
             btnLogin.textContent = "Ingresando...";
             loginError.style.display = 'none';
-
             try {
-                const email = loginEmail.value;
-                const password = loginPassword.value;
-                
-                await signInWithEmailAndPassword(auth, email, password);
-                // ¡Éxito! onAuthStateChanged se encargará del resto
-                
+                await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
             } catch (error) {
                 console.error("Error en inicio de sesión:", error.code);
                 if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
@@ -495,14 +621,10 @@
                 }
                 loginError.style.display = 'block';
             }
-            
             btnLogin.disabled = false;
             btnLogin.textContent = "Iniciar Sesión";
         }
 
-        /**
-         * Cierra la sesión del usuario
-         */
         async function logOut() {
             try {
                 await signOut(auth);
@@ -517,58 +639,63 @@
         loginForm.addEventListener('submit', signInWithEmail);
         btnLogout.addEventListener('click', logOut);
 
+        formBusqueda.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const grupoId = inputBuscarGrupo.value.trim();
+            if (!grupoId) { alert("Ingresa un ID de Grupo."); return; }
+            btnBuscar.disabled = true;
+            btnBuscar.textContent = "Buscando...";
+            await Promise.all([
+                buscarAlumnos(grupoId, inputBuscarNombre.value.trim()),
+                cargarActividadesMaestra(grupoId) 
+            ]);
+            btnBuscar.disabled = false;
+            btnBuscar.textContent = "Buscar Alumnos";
+        });
+        
         btnIrARegistrar.addEventListener('click', () => {
             inputRegGrupo.value = inputBuscarGrupo.value; 
             mostrarPanel('registro');
         });
         
-        formBusqueda.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const grupoId = inputBuscarGrupo.value.trim();
-            const nombreBusqueda = inputBuscarNombre.value.trim();
-            
-            if (!grupoId) {
-                alert("Por favor, ingresa un ID de Grupo para buscar.");
-                return;
-            }
-            
-            btnBuscar.disabled = true;
-            btnBuscar.textContent = "Buscando...";
-            await buscarAlumnos(grupoId, nombreBusqueda);
-            btnBuscar.disabled = false;
-            btnBuscar.textContent = "Buscar Alumnos";
-        });
-
+        btnIrAReporte.addEventListener('click', () => mostrarPanel('reporte-grupo'));
+        
         formRegistro.addEventListener('submit', async (e) => {
             e.preventDefault();
             btnGuardarAlumno.disabled = true;
             btnGuardarAlumno.textContent = "Guardando...";
-            
             const nuevoAlumno = {
                 nombre: inputRegNombre.value.trim(),
                 apellido: inputRegApellido.value.trim(),
             };
             const grupoId = inputRegGrupo.value.trim();
-            
             const alumnoGuardado = await registrarNuevoAlumno(grupoId, nuevoAlumno);
-            
             if (alumnoGuardado) {
                 const nombreCompleto = `${alumnoGuardado.nombre} ${alumnoGuardado.apellido || ''}`;
                 await cargarDatosDelAlumno(grupoId, alumnoGuardado.id, nombreCompleto);
+                await cargarTodosLosGrupos();
             }
-            
             btnGuardarAlumno.disabled = false;
             btnGuardarAlumno.textContent = "Guardar Alumno";
             formRegistro.reset();
         });
-
         btnCancelarRegistro.addEventListener('click', () => mostrarPanel('busqueda'));
 
         btnVolverABusqueda.addEventListener('click', () => {
             alumnoActual = null; 
             mostrarPanel('busqueda');
         });
-
+        btnNuevaActividadMostrar.addEventListener('click', () => {
+            nuevaActividadForm.style.display = 'block';
+            btnNuevaActividadMostrar.style.display = 'none';
+        });
+        btnNuevaActividadCancelar.addEventListener('click', () => {
+            nuevaActividadForm.style.display = 'none';
+            btnNuevaActividadMostrar.style.display = 'block';
+            nuevaActividadNombre.value = '';
+        });
+        btnNuevaActividadGuardar.addEventListener('click', guardarNuevaActividadMaestra);
+        actividadSelect.addEventListener('change', actualizarEstadoBotonGuardar); 
         gridInvestigacion.addEventListener('click', (e) => {
             if (e.target.classList.contains('btn-nivel')) {
                 gridInvestigacion.querySelectorAll('.btn-nivel').forEach(btn => btn.classList.remove('active'));
@@ -577,71 +704,232 @@
                 actualizarEstadoBotonGuardar(); 
             }
         });
-        
-        inputActividadNombre.addEventListener('input', actualizarEstadoBotonGuardar);
-
         formRubrica.addEventListener('submit', manejarGuardadoDeActividad);
+
+        btnVolverABusquedaReporte.addEventListener('click', () => mostrarPanel('busqueda'));
+        grupoReporteSelect.addEventListener('change', (e) => {
+            generarReporteDeGrupo(e.target.value);
+        });
 
 
         // --- 8. FUNCIONES DE GESTIÓN DE PANELES (UI) ---
 
-        /**
-         * Muestra un panel específico y oculta los demás
-         */
         function mostrarPanel(panelId) {
             panelBusqueda.classList.remove('activo');
             panelRegistro.classList.remove('activo');
             panelEvaluacion.classList.remove('activo');
-
-            if (panelId === 'busqueda') {
-                panelBusqueda.classList.add('activo');
-            } else if (panelId === 'registro') {
-                panelRegistro.classList.add('activo');
-            } else if (panelId === 'evaluacion') {
-                panelEvaluacion.classList.add('activo');
-            }
+            panelReporteGrupo.classList.remove('activo');
+            if (panelId === 'busqueda') { panelBusqueda.classList.add('activo'); }
+            else if (panelId === 'registro') { panelRegistro.classList.add('activo'); }
+            else if (panelId === 'evaluacion') { panelEvaluacion.classList.add('activo'); }
+            else if (panelId === 'reporte-grupo') { panelReporteGrupo.classList.add('activo'); }
         }
 
-        /**
-         * Habilita o deshabilita el botón de guardar actividad
-         */
         function actualizarEstadoBotonGuardar() {
-            if (alumnoActual && valorSeleccionado && inputActividadNombre.value.trim() !== '' && !estaGuardando) {
+            if (alumnoActual && valorSeleccionado && actividadSelect.value !== '' && !estaGuardando) {
                 btnGuardarActividad.disabled = false;
             } else {
                 btnGuardarActividad.disabled = true;
             }
+        }
+        
+        function limpiarFormularioEvaluacion() {
+            actividadSelect.value = "";
+            gridInvestigacion.querySelectorAll('.btn-nivel').forEach(btn => btn.classList.remove('active'));
+            valorSeleccionado = null;
+            actualizarEstadoBotonGuardar();
         }
 
         
         // --- 9. FUNCIONES PRINCIPALES (Lógica de App y Firebase) ---
 
         /**
+         * Carga TODOS los grupos en el dropdown de reporte
+         */
+        async function cargarTodosLosGrupos() {
+            try {
+                const rutaGrupos = collection(db, 'grupos');
+                const q = query(rutaGrupos, orderBy('__name__'));
+                const querySnapshot = await getDocs(q);
+                let optionsHTML = '<option value="" disabled selected>-- Selecciona un grupo --</option>';
+                if (querySnapshot.empty) {
+                    optionsHTML = '<option value="" disabled>-- No hay grupos registrados --</option>';
+                } else {
+                    querySnapshot.forEach((doc) => {
+                        optionsHTML += `<option value="${doc.id}">${doc.id}</option>`;
+                    });
+                }
+                grupoReporteSelect.innerHTML = optionsHTML;
+            } catch (error) {
+                console.error("Error al cargar todos los grupos: ", error);
+                grupoReporteSelect.innerHTML = '<option value="" disabled>-- Error al cargar --</option>';
+            }
+        }
+        
+        /**
+         * Genera la tabla de reporte para un grupo (¡ACTUALIZADO!)
+         */
+        async function generarReporteDeGrupo(grupoId) {
+            if (!grupoId) return;
+            reporteGrupoOutput.innerHTML = `<p style="text-align: center; color: var(--dark-subtext);">Cargando reporte para "${grupoId}"...</p>`;
+            try {
+                const rutaAlumnos = collection(db, 'grupos', grupoId, 'alumnos');
+                const alumnosSnap = await getDocs(query(rutaAlumnos, orderBy('nombre')));
+                if (alumnosSnap.empty) {
+                    reporteGrupoOutput.innerHTML = `<p style="text-align: center;">No hay alumnos registrados en este grupo.</p>`;
+                    return;
+                }
+
+                // Prepara promesas para obtener las actividades de CADA alumno
+                const promesasAlumnos = alumnosSnap.docs.map(async (alumnoDoc) => {
+                    const alumno = { id: alumnoDoc.id, ...alumnoDoc.data() };
+                    
+                    // Obtener actividades para este alumno
+                    const rutaActividades = collection(db, 'grupos', grupoId, 'alumnos', alumno.id, 'actividades');
+                    const actividadesSnap = await getDocs(rutaActividades);
+                    
+                    // Contar los niveles Y sumar porcentajes
+                    let conteo = {"Excelente": 0, "Satisfactorio": 0, "Suficiente": 0, "Insatisfactorio": 0};
+                    let sumaPorcentajes = 0; // <-- NUEVO
+                    
+                    actividadesSnap.forEach(actDoc => {
+                        const data = actDoc.data();
+                        const nivel = data.nivelGeneral;
+                        if (conteo.hasOwnProperty(nivel)) {
+                            conteo[nivel]++;
+                        }
+                        sumaPorcentajes += data.porcentaje || 0; // <-- NUEVO (Suma el porcentaje)
+                    });
+                    
+                    // Calcular promedio
+                    const promedio = actividadesSnap.size > 0 ? (sumaPorcentajes / actividadesSnap.size).toFixed(1) : 0; // <-- NUEVO
+                    
+                    return {
+                        ...alumno,
+                        totalActividades: actividadesSnap.size,
+                        conteo: conteo,
+                        promedio: promedio // <-- NUEVO
+                    };
+                });
+                
+                const reporteAlumnos = await Promise.all(promesasAlumnos);
+                
+                // Generar la tabla HTML (con nueva columna)
+                let tablaHTML = `
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Alumno</th>
+                                <th>Total Act.</th>
+                                <th>Excelente</th>
+                                <th>Satisfactorio</th>
+                                <th>Suficiente</th>
+                                <th>Insatisfactorio</th>
+                                <th>Promedio</th> <!-- NUEVA COLUMNA -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                reporteAlumnos.forEach(alumno => {
+                    tablaHTML += `
+                        <tr>
+                            <td>${alumno.nombre} ${alumno.apellido || ''}</td>
+                            <td class="count-cell">${alumno.totalActividades}</td>
+                            <td class="count-cell" style="color: var(--color-excelente);">${alumno.conteo.Excelente}</td>
+                            <td class="count-cell" style="color: var(--color-satisfatorio);">${alumno.conteo.Satisfactorio}</td>
+                            <td class="count-cell" style="color: var(--color-suficiente);">${alumno.conteo.Suficiente}</td>
+                            <td class="count-cell" style="color: var(--color-insatisfactorio);">${alumno.conteo.Insatisfactorio}</td>
+                            <td class="promedio-cell">${alumno.promedio}%</td> <!-- NUEVA CELDA -->
+                        </tr>
+                    `;
+                });
+                
+                tablaHTML += `</tbody></table>`;
+                reporteGrupoOutput.innerHTML = tablaHTML;
+
+            } catch (error) {
+                console.error("Error al generar reporte de grupo: ", error);
+                reporteGrupoOutput.innerHTML = `<p style="text-align: center; color: var(--alert-error);">Error al generar reporte.</p>`;
+            }
+        }
+
+        /**
+         * Carga el banco de actividades en el <select>
+         */
+        async function cargarActividadesMaestra(grupoId) {
+            if (!grupoId) { actividadSelect.innerHTML = '<option value="" disabled selected>-- Ingresa un ID de Grupo --</option>'; return; }
+            actividadSelect.innerHTML = '<option value="" disabled selected>-- Cargando... --</option>';
+            try {
+                const ruta = collection(db, 'grupos', grupoId, 'actividades_maestra');
+                const q = query(ruta, orderBy('nombre'));
+                const querySnapshot = await getDocs(q);
+                let optionsHTML = '<option value="" disabled selected>-- Selecciona una actividad --</option>';
+                if (querySnapshot.empty) {
+                    optionsHTML = '<option value="" disabled selected>-- No hay actividades. ¡Registra una! --</option>';
+                } else {
+                    querySnapshot.forEach((doc) => {
+                        optionsHTML += `<option value="${doc.data().nombre}">${doc.data().nombre}</option>`;
+                    });
+                }
+                actividadSelect.innerHTML = optionsHTML;
+            } catch (error) {
+                console.error("Error al cargar banco de actividades: ", error);
+                actividadSelect.innerHTML = '<option value="" disabled selected>-- Error al cargar --</option>';
+            }
+        }
+        
+        /**
+         * Guarda una nueva actividad en el banco
+         */
+        async function guardarNuevaActividadMaestra() {
+            const grupoId = inputBuscarGrupo.value.trim();
+            const nuevoNombre = nuevaActividadNombre.value.trim();
+            if (!grupoId || !nuevoNombre) { alert("Asegúrate de tener un ID de Grupo y un nombre."); return; }
+            btnNuevaActividadGuardar.disabled = true;
+            btnNuevaActividadGuardar.textContent = "Guardando...";
+            try {
+                const grupoRef = doc(db, 'grupos', grupoId);
+                await setDoc(grupoRef, { ultimaActividadMaestra: serverTimestamp() }, { merge: true });
+
+                const ruta = collection(db, 'grupos', grupoId, 'actividades_maestra');
+                await addDoc(ruta, {
+                    nombre: nuevoNombre,
+                    fechaCreacion: serverTimestamp()
+                });
+                nuevaActividadNombre.value = '';
+                nuevaActividadForm.style.display = 'none';
+                btnNuevaActividadMostrar.style.display = 'block';
+                await cargarActividadesMaestra(grupoId);
+                actividadSelect.value = nuevoNombre;
+                actualizarEstadoBotonGuardar();
+            } catch (error) {
+                console.error("Error al guardar nueva actividad maestra: ", error);
+                alert("Error al guardar en el banco.");
+            }
+            btnNuevaActividadGuardar.disabled = false;
+            btnNuevaActividadGuardar.textContent = "Guardar y Seleccionar";
+        }
+
+        /**
          * Busca alumnos en Firebase por grupo y nombre
          */
         async function buscarAlumnos(grupoId, nombreBusqueda) {
             listaResultados.innerHTML = '<li>Cargando...</li>';
-            
             const rutaAlumnos = collection(db, 'grupos', grupoId, 'alumnos');
             let q;
-
             if (nombreBusqueda) {
                 const fin = nombreBusqueda.replace(/.$/, c => String.fromCharCode(c.charCodeAt(0) + 1));
-                q = query(rutaAlumnos, 
-                          where('nombre', '>=', nombreBusqueda), 
-                          where('nombre', '<', fin),
-                          orderBy('nombre'));
+                q = query(rutaAlumnos, where('nombre', '>=', nombreBusqueda), where('nombre', '<', fin), orderBy('nombre'));
             } else {
                 q = query(rutaAlumnos, orderBy('nombre'));
             }
-
             try {
                 const querySnapshot = await getDocs(q);
                 if (querySnapshot.empty) {
                     listaResultados.innerHTML = '<li>No se encontraron alumnos.</li>';
                     return;
                 }
-                
                 listaResultados.innerHTML = ''; 
                 querySnapshot.forEach((doc) => {
                     const alumno = { id: doc.id, ...doc.data() };
@@ -653,7 +941,6 @@
                     });
                     listaResultados.appendChild(item);
                 });
-
             } catch (error) {
                 console.error("Error al buscar alumnos: ", error);
                 listaResultados.innerHTML = '<li>Error al cargar alumnos. Revisa las reglas.</li>';
@@ -669,6 +956,12 @@
                 return null;
             }
             try {
+                const grupoRef = doc(db, 'grupos', grupoId);
+                await setDoc(grupoRef, { 
+                    nombreAmigable: grupoId,
+                    ultimoRegistro: serverTimestamp() 
+                }, { merge: true });
+
                 const rutaColeccion = collection(db, 'grupos', grupoId, 'alumnos');
                 const docRef = await addDoc(rutaColeccion, datosAlumno);
                 alert("¡Alumno registrado con éxito!");
@@ -688,74 +981,105 @@
             nombreAlumnoEvaluando.textContent = nombreCompleto;
             concentradoOutput.textContent = "Cargando actividades...";
             retroOutput.textContent = "Cargando retroalimentación...";
+            
+            await cargarActividadesMaestra(grupoId);
             mostrarPanel('evaluacion'); 
-            actualizarEstadoBotonGuardar(); 
+            limpiarFormularioEvaluacion(); 
+            
+            const concentrado = await obtenerConcentrado(alumnoActual.grupoId, alumnoActual.id);
+            mostrarConcentradoEnUI(concentrado);
+            generarRetroalimentacion(concentrado, alumnoActual.nombre);
+        }
+        
+        /**
+         * Maneja el guardado de la evaluación (¡ACTUALIZADO!)
+         */
+        async function manejarGuardadoDeActividad(e) {
+            e.preventDefault(); 
+            if (!alumnoActual || !valorSeleccionado || estaGuardando) return;
+            estaGuardando = true;
+            btnGuardarActividad.disabled = true;
+            btnGuardarActividad.textContent = "Guardando...";
+            
+            // Obtener nivel y porcentaje
+            const nivel = valorSeleccionado;
+            const porcentaje = NIVEL_A_PORCENTAJE[nivel] || 0; // Busca el % en el mapa
+            
+            const datosActividad = {
+                nombreActividad: actividadSelect.value, 
+                nivelGeneral: nivel,
+                porcentaje: porcentaje // <-- NUEVO DATO GUARDADO
+            };
+            
+            await guardarActividad(alumnoActual.grupoId, alumnoActual.id, datosActividad);
+            
+            estaGuardando = false;
+            btnGuardarActividad.textContent = "Guardar Evaluación del Alumno";
+            limpiarFormularioEvaluacion(); 
+            
+            // Recargar reportes individuales
             const concentrado = await obtenerConcentrado(alumnoActual.grupoId, alumnoActual.id);
             mostrarConcentradoEnUI(concentrado);
             generarRetroalimentacion(concentrado, alumnoActual.nombre);
         }
 
         /**
-         * Maneja el envío del formulario de actividad
-         */
-        async function manejarGuardadoDeActividad(e) {
-            e.preventDefault(); 
-            if (!alumnoActual || !valorSeleccionado || estaGuardando) return;
-            
-            estaGuardando = true;
-            btnGuardarActividad.disabled = true;
-            btnGuardarActividad.textContent = "Guardando...";
-            
-            const datosActividad = {
-                nombreActividad: inputActividadNombre.value.trim(),
-                nivelGeneral: valorSeleccionado,
-            };
-            
-            await guardarActividad(alumnoActual.grupoId, alumnoActual.id, datosActividad);
-            
-            estaGuardando = false;
-            btnGuardarActividad.textContent = "Guardar Actividad";
-            formRubrica.reset();
-            gridInvestigacion.querySelectorAll('.btn-nivel').forEach(btn => btn.classList.remove('active'));
-            valorSeleccionado = null;
-            actualizarEstadoBotonGuardar();
-            
-            await cargarDatosDelAlumno(alumnoActual.grupoId, alumnoActual.id, alumnoActual.nombre);
-        }
-
-        /**
-         * Muestra el concentrado de actividades
+         * Muestra el concentrado de actividades (¡ACTUALIZADO!)
          */
         function mostrarConcentradoEnUI(actividades) {
             if (actividades.length === 0) {
                 concentradoOutput.textContent = "Este alumno aún no tiene actividades registradas.";
                 return;
             }
-            let texto = `Total de actividades: ${actividades.length}\n---------------------------------\n`;
+            
+            let texto = `Total de actividades: ${actividades.length}\n`;
+            let sumaPorcentajes = 0; // <-- NUEVO
+            
             actividades.forEach(act => {
                 const fecha = act.fechaCreacion ? act.fechaCreacion.toDate().toLocaleDateString() : 'Sin fecha';
-                texto += `[${fecha}] ${act.nombreActividad} - Nivel: ${act.nivelGeneral}\n`;
+                const porcentaje = act.porcentaje !== undefined ? `${act.porcentaje}%` : 'N/A'; // <-- NUEVO
+                sumaPorcentajes += act.porcentaje || 0; // <-- NUEVO
+                
+                // Muestra Nivel y Porcentaje
+                texto += `[${fecha}] ${act.nombreActividad} - ${act.nivelGeneral} (${porcentaje})\n`; // <-- MODIFICADO
             });
+            
+            // Calcula y muestra el promedio
+            const promedio = actividades.length > 0 ? (sumaPorcentajes / actividades.length).toFixed(1) : 0; // <-- NUEVO
+            
+            texto += "---------------------------------\n";
+            texto += `CALIFICACIÓN PROMEDIO: ${promedio}%`; // <-- NUEVO
+            
             concentradoOutput.textContent = texto;
         }
         
         /**
-         * Genera y muestra la retroalimentación
+         * Genera y muestra la retroalimentación (¡ACTUALIZADO!)
          */
         function generarRetroalimentacion(actividades, nombreAlumno) {
             if (actividades.length === 0) {
                 retroOutput.textContent = "No hay suficientes datos para generar una retroalimentación.";
                 return;
             }
+            
             let conteo = {"Excelente": 0, "Satisfactorio": 0, "Suficiente": 0, "Insatisfactorio": 0,};
+            let sumaPorcentajes = 0; // <-- NUEVO
+            
             actividades.forEach(act => {
                 if (conteo.hasOwnProperty(act.nivelGeneral)) {
                     conteo[act.nivelGeneral]++;
                 }
+                sumaPorcentajes += act.porcentaje || 0; // <-- NUEVO
             });
             
+            // Calcula el promedio
+            const promedio = actividades.length > 0 ? (sumaPorcentajes / actividades.length).toFixed(1) : 0; // <-- NUEVO
+            
             let retro = `¡Hola ${nombreAlumno}!\n\n`;
-            retro += `He revisado tus ${actividades.length} actividades más recientes y este es tu resumen:\n`;
+            retro += `He revisado tus ${actividades.length} actividades más recientes.\n`;
+            retro += `Tu calificación promedio actual es: ${promedio}%\n\n`; // <-- NUEVO
+            
+            retro += `Resumen de niveles:\n`;
             retro += `- Nivel Excelente: ${conteo.Excelente}\n`;
             retro += `- Nivel Satisfactorio: ${conteo.Satisfactorio}\n`;
             retro += `- Nivel Suficiente: ${conteo.Suficiente}\n`;
@@ -777,9 +1101,10 @@
         async function guardarActividad(grupoId, alumnoId, datosActividad) {
             const rutaColeccion = collection(db, 'grupos', grupoId, 'alumnos', alumnoId, 'actividades');
             try {
+                // datosActividad ya incluye el 'porcentaje'
                 const datosCompletos = { ...datosActividad, fechaCreacion: serverTimestamp() };
                 await addDoc(rutaColeccion, datosCompletos);
-                console.log("¡Actividad guardada!");
+                console.log("¡Actividad guardada con porcentaje!");
             } catch (error) {
                 console.error("Error al guardar: ", error);
                 alert("Error al guardar. Revisa la consola.");
@@ -808,3 +1133,4 @@
     </script>
 </body>
 </html>
+
