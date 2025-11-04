@@ -3,118 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Rúbricas (Firebase v9)</title>
+    <title>Innova Schools Ojo de Agua - Sistema de Rúbricas</title>
 
     <style>
-        /* Define tus colores vivos y personalizables */
+        /* --- Paleta de Colores (Innova Schools + Dark Theme) --- */
         :root {
-            --color-excelente: #4CAF50; /* Verde */
-            --color-satisfactorio: #2196F3; /* Azul */
-            --color-suficiente: #ffeb3b; /* Amarillo */
-            --color-insatisfactorio: #f44336; /* Rojo */
-            --color-fondo: #f4f7f6;
-            --color-tarjeta: #ffffff;
-            --color-texto: #333;
-            --color-borde: #e0e0e0;
-            --color-principal: #007bff;
+            --innova-blue: #0066a3;
+            --innova-green: #61ad47;
+            --innova-orange: #f19232;
+            --dark-background: #1a1a2e;
+            --dark-card: #2c2c4d;
+            --dark-text: #e0e0e0;
+            --dark-subtext: #b0b0b0;
+            --dark-border: #444466;
+            --dark-input-bg: #3e3e5c;
+            --alert-success: #28a745;
+            --alert-error: #dc3545;
+            --color-excelente: var(--innova-green);
+            --color-satisfatorio: var(--innova-blue);
+            --color-suficiente: var(--innova-orange);
+            --color-insatisfactorio: #dc3545;
         }
 
+        /* --- Estilos Generales --- */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--color-fondo);
-            color: var(--color-texto);
+            background-color: var(--dark-background);
+            color: var(--dark-text);
             margin: 0;
             padding: 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-
-        #app-container {
-            max-width: 900px;
-            margin: 20px auto;
-            padding: 25px;
-            background: var(--color-tarjeta);
+        
+        /* --- Contenedor de Login --- */
+        #login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 40px;
+            background: var(--dark-card);
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        h1, h2, h3 {
-            margin-top: 0;
-            color: var(--color-principal);
-        }
-        
-        h1 {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
             text-align: center;
-            border-bottom: 2px solid var(--color-borde);
-            padding-bottom: 15px;
+        }
+        #login-container h1 {
+            color: var(--innova-blue);
+            border-bottom: none;
         }
         
-        h2 {
-            border-bottom: 1px solid var(--color-borde);
-            padding-bottom: 10px;
-        }
-
-        /* --- Panel de Control --- */
-        #control-panel {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .input-group {
+        /* Formulario de Login */
+        #login-form {
             display: flex;
             flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
         }
-
-        .input-group label {
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }
-
-        .input-group input[type="text"] {
+        #login-form input {
             padding: 12px;
-            border: 1px solid var(--color-borde);
+            border: 1px solid var(--dark-border);
             border-radius: 8px;
             font-size: 1em;
+            background-color: var(--dark-input-bg);
+            color: var(--dark-text);
         }
-
-        #btn-cargar {
-            grid-column: 1 / -1; /* Ocupa todo el ancho */
-            padding: 15px;
-            font-size: 1.1em;
-            font-weight: bold;
+        #btn-login {
+            background-color: var(--innova-blue);
             color: white;
-            background-color: var(--color-principal);
+            padding: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.2s;
         }
-
-        #btn-cargar:hover {
-            background-color: #0056b3;
-        }
-
-        /* --- Formulario de Rúbrica --- */
-        #rubrica-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        #btn-login:hover { background-color: #004d7a; }
+        
+        /* Mensaje de error de Login */
+        #login-error {
+            color: var(--color-insatisfactorio);
+            margin-top: 15px;
+            font-weight: 600;
+            display: none; /* Oculto por defecto */
         }
         
-        #rubrica-form input[type="text"] {
-             width: 100%;
-             box-sizing: border-box; /* Para que el padding no afecte el ancho */
+        /* --- Contenedor de la Aplicación --- */
+        #app-wrapper {
+            display: none; /* Oculto por defecto */
         }
-
+        #app-container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 25px;
+            background: var(--dark-card);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        /* Encabezado de Usuario */
+        #user-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--dark-border);
+        }
+        #user-info-header span {
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+        #btn-logout {
+            background-color: var(--color-insatisfactorio);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        #btn-logout:hover { background-color: #b02a37; }
+        
+        /* Títulos */
+        h1, h2, h3, h4 { margin-top: 0; }
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid var(--dark-border);
+            padding-bottom: 15px;
+            font-size: 2.2em;
+            letter-spacing: 1px;
+            color: var(--innova-blue);
+        }
+        h2 {
+            border-bottom: 1px solid var(--dark-border);
+            padding-bottom: 10px;
+            color: var(--innova-green);
+        }
+        h3, h4 { color: var(--innova-orange); }
+        
+        /* Paneles */
+        .panel {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+            padding: 15px 0;
+        }
+        .panel.activo { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Grupos de Inputs */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            color: var(--dark-text);
+        }
+        .input-group input[type="text"] {
+            padding: 12px;
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            font-size: 1em;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: var(--dark-input-bg);
+            color: var(--dark-text);
+        }
+        
+        /* Botones Generales */
+        .btn {
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, opacity 0.2s, transform 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 10px;
+        }
+        .btn-primario { background-color: var(--innova-blue); }
+        .btn-primario:hover { background-color: #004d7a; transform: translateY(-1px); }
+        .btn-exito { background-color: var(--innova-green); }
+        .btn-exito:hover { background-color: #4a8c36; transform: translateY(-1px); }
+        .btn:disabled {
+            background-color: #55557a;
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Lista de Resultados */
+        #lista-resultados {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            background-color: var(--dark-input-bg);
+        }
+        #lista-resultados li {
+            padding: 15px;
+            border-bottom: 1px solid var(--dark-border);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #lista-resultados li:last-child { border-bottom: none; }
+        #lista-resultados li:hover { background-color: #4a4a6e; }
+        #lista-resultados li span { font-weight: 600; color: var(--innova-orange); }
+        #lista-resultados li small { color: var(--dark-subtext); }
+        
+        /* Botones de Rúbrica */
         .botones-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
+            margin-top: 15px;
         }
-
         .btn-nivel {
-            padding: 25px; /* Botones grandes */
+            padding: 25px;
             font-size: 1.1em;
             font-weight: bold;
             color: white;
@@ -124,124 +241,147 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
-        
-        .btn-nivel:hover {
-            transform: scale(1.03); /* Efecto al pasar el mouse */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        /* Estilo para el botón SELECCIONADO */
-        .btn-nivel.active {
-            border-color: #000;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
-            transform: scale(1.05);
-        }
-
-        /* Asignamos los colores */
+        .btn-nivel:hover { transform: scale(1.03); }
+        .btn-nivel.active { border-color: var(--dark-text); transform: scale(1.05); }
         .btn-excelente { background-color: var(--color-excelente); }
-        .btn-satisfactorio { background-color: var(--color-satisfactorio); }
+        .btn-satisfatorio { background-color: var(--color-satisfatorio); }
         .btn-suficiente { background-color: var(--color-suficiente); color: #333; text-shadow: none;}
         .btn-insatisfactorio { background-color: var(--color-insatisfactorio); }
         
-        #btn-guardar {
-            padding: 18px;
-            font-size: 1.2em;
-            font-weight: bold;
-            color: white;
-            background-color: #28a745; /* Verde de "Guardar" */
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        /* --- Área de Resultados --- */
-        #concentrado-area {
-            margin-top: 30px;
-        }
-        
+        /* Áreas de Salida */
+        #concentrado-area { margin-top: 30px; }
         #concentrado-output, #retro-output {
-            background-color: #fafafa;
-            border: 1px solid var(--color-borde);
+            background-color: var(--dark-input-bg);
+            border: 1px solid var(--dark-border);
             border-radius: 8px;
             padding: 15px;
-            white-space: pre-wrap; /* Mantiene saltos de línea */
-            word-wrap: break-word; /* Evita desbordamiento */
+            white-space: pre-wrap;
+            word-wrap: break-word;
             min-height: 100px;
             font-family: "Courier New", Courier, monospace;
             font-size: 0.95em;
+            color: var(--dark-text);
+        }
+        #nombre-alumno-evaluando {
+            color: var(--innova-orange);
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <div id="app-container">
-        <h1>Sistema de Rúbricas Docente</h1>
+    <div id="login-container">
+        <h1>Innova Schools</h1>
+        <p style="color: var(--dark-subtext);">Inicia sesión para continuar</p>
         
-        <div id="control-panel">
-            <h2>Panel de Control</h2>
-            <div class="input-group">
-                <label for="grupo-id">ID del Grupo:</label>
-                <input type="text" id="grupo-id" value="primero_a_2025">
-            </div>
-            <div class="input-group">
-                <label for="alumno-id">ID del Alumno:</label>
-                <input type="text" id="alumno-id" value="ana_garcia_123">
-            </div>
-            <div class="input-group">
-                <label for="alumno-nombre">Nombre del Alumno:</label>
-                <input type="text" id="alumno-nombre" value="Ana García">
-            </div>
-            
-            <button id="btn-cargar">Cargar Alumno</button>
-        </div>
-        
-        <form id="rubrica-form">
-            <h2>Nueva Actividad</h2>
-            <div class="input-group">
-                <label for="actividad-nombre">Nombre de la Actividad:</label>
-                <input type="text" id="actividad-nombre" placeholder="Ej: Mapa Mental de la Célula" required>
-            </div>
-            
-            <h3>Rúbrica 1: Calidad de Investigación</h3>
-            <div class="botones-grid" id="grid-investigacion">
-                <button type="button" class="btn-nivel btn-excelente" data-valor="Excelente">Excelente</button>
-                <button type="button" class="btn-nivel btn-satisfactorio" data-valor="Satisfactorio">Satisfactorio</button>
-                <button type="button" class="btn-nivel btn-suficiente" data-valor="Suficiente">Suficiente</button>
-                <button type="button" class="btn-nivel btn-insatisfactorio" data-valor="Insatisfactorio">Insatisfactorio</button>
-            </div>
-
-            <button type="submit" id="btn-guardar">Guardar Actividad</button>
+        <form id="login-form">
+            <input type="email" id="login-email" placeholder="Correo (ej: admin@innova.com)" required>
+            <input type="password" id="login-password" placeholder="Contraseña" required>
+            <button type="submit" id="btn-login">Iniciar Sesión</button>
         </form>
         
-        <div id="concentrado-area">
-            <h2>Concentrado del Alumno</h2>
-            <pre id="concentrado-output">Carga un alumno para ver sus actividades...</pre>
+        <div id="login-error"></div>
+    </div>
+
+    <div id="app-wrapper">
+        <div id="app-container">
             
-            <h2>Retroalimentación Generada</h2>
-            <pre id="retro-output">Aquí se generará la retroalimentación...</pre>
+            <div id="user-info-header">
+                <span id="user-display-name">Cargando...</span>
+                <button id="btn-logout">Cerrar Sesión</button>
+            </div>
+            
+            <h1>Innova Schools Ojo de Agua</h1>
+    
+            <div id="panel-busqueda" class="panel">
+                <h2>Gestión de Alumnos</h2>
+                <div class="input-group">
+                    <label for="buscar-grupo">ID del Grupo:</label>
+                    <input type="text" id="buscar-grupo" value="primero_a_2025">
+                </div>
+                <form id="form-busqueda">
+                    <div class="input-group">
+                        <label for="buscar-nombre">Buscar por Nombre:</label>
+                        <input type="text" id="buscar-nombre" placeholder="Escribe el nombre del alumno...">
+                    </div>
+                    <button type="submit" class="btn btn-primario" id="btn-buscar">Buscar Alumnos</button>
+                </form>
+                <button class="btn btn-exito" id="btn-ir-a-registrar">Registrar Nuevo Alumno</button>
+                <h3>Resultados:</h3>
+                <ul id="lista-resultados">
+                    <li>Busca un grupo para ver los alumnos...</li>
+                </ul>
+            </div>
+    
+            <div id="panel-registro" class="panel">
+                <h2>Registrar Nuevo Alumno</h2>
+                <form id="form-registro">
+                    <div class="input-group">
+                        <label for="reg-grupo">ID del Grupo:</label>
+                        <input type="text" id="reg-grupo" placeholder="Ej: primero_a_2025" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="reg-nombre">Nombre(s):</label>
+                        <input type="text" id="reg-nombre" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="reg-apellido">Apellido(s):</label>
+                        <input type="text" id="reg-apellido" required>
+                    </div>
+                    <button type="submit" class="btn btn-exito" id="btn-guardar-alumno">Guardar Alumno</button>
+                    <button type="button" class="btn btn-primario" id="btn-cancelar-registro">Cancelar</button>
+                </form>
+            </div>
+    
+            <div id="panel-evaluacion" class="panel">
+                <h2>Evaluando a: <span id="nombre-alumno-evaluando">...</span></h2>
+                <button class="btn btn-primario" id="btn-volver-a-busqueda">Volver a Búsqueda</button>
+                <form id="rubrica-form">
+                    <h3>Nueva Actividad</h3>
+                    <div class="input-group">
+                        <label for="actividad-nombre">Nombre de la Actividad:</label>
+                        <input type="text" id="actividad-nombre" placeholder="Ej: Mapa Mental de la Célula" required>
+                    </div>
+                    <h4>Rúbrica 1: Calidad de Investigación</h4>
+                    <div class="botones-grid" id="grid-investigacion">
+                        <button type="button" class="btn-nivel btn-excelente" data-valor="Excelente">Excelente</button>
+                        <button type="button" class="btn-nivel btn-satisfatorio" data-valor="Satisfactorio">Satisfactorio</button>
+                        <button type="button" class="btn-nivel btn-suficiente" data-valor="Suficiente">Suficiente</button>
+                        <button type="button" class="btn-nivel btn-insatisfactorio" data-valor="Insatisfactorio">Insatisfactorio</button>
+                    </div>
+                    <button type="submit" class="btn btn-exito" id="btn-guardar-actividad" disabled>Guardar Actividad</button>
+                </form>
+                <div id="concentrado-area">
+                    <h2>Concentrado del Alumno</h2>
+                    <pre id="concentrado-output">Carga un alumno para ver sus actividades...</pre>
+                    <h2>Retroalimentación Generada</h2>
+                    <pre id="retro-output">Aquí se generará la retroalimentación...</pre>
+                </div>
+            </div>
         </div>
     </div>
 
     <script type="module">
-        // --- 1. IMPORTACIONES (Sintaxis v9 Modular) ---
-        // Usamos las URLs completas del CDN de Firebase para que funcione en un solo archivo
+        // --- 1. IMPORTACIONES ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        // Importaciones de Firestore (Base de Datos)
         import { 
-            getFirestore, 
-            collection, 
-            doc, 
-            addDoc, 
-            getDocs, 
-            query, 
-            orderBy, 
-            serverTimestamp 
+            getFirestore, collection, doc, addDoc, getDocs, 
+            query, orderBy, serverTimestamp, where 
         } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        // Importaciones de Auth (Autenticación)
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword,
+            onAuthStateChanged, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 
         // --- 2. CONFIGURACIÓN DE FIREBASE ---
         // ¡¡¡ ATENCIÓN !!!
         // ¡REEMPLAZA ESTA CLAVE CON LA NUEVA QUE GENERASTE!
         const firebaseConfig = {
-          apiKey: "TAIzaSyC_NbLtbrbs_t1GWkbnG382KkLc7I1_x5M",
+          apiKey: "AIzaSyC_NbLtbrbs_t1GWkbnG382KkLc7I1_x5M", // <-- ¡¡¡REEMPLAZA ESTO!!!
           authDomain: "calificaciones-8911e.firebaseapp.com",
           projectId: "calificaciones-8911e",
           storageBucket: "calificaciones-8911e.firebasestorage.app",
@@ -253,161 +393,367 @@
         // --- 3. INICIALIZACIÓN ---
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        console.log("Firebase v9 (Modular) Conectado.");
+        const auth = getAuth(app); 
 
-        // --- 4. REFERENCIAS A ELEMENTOS DEL DOM ---
-        const btnCargar = document.getElementById('btn-cargar');
-        const form = document.getElementById('rubrica-form');
+        // --- 4. VARIABLES DE ESTADO GLOBALES ---
+        let alumnoActual = null; 
+        let valorSeleccionado = null; 
+        let estaGuardando = false; 
+
+        // --- 5. REFERENCIAS A ELEMENTOS DEL DOM ---
+        // Referencias de Login y App
+        const loginContainer = document.getElementById('login-container');
+        const appWrapper = document.getElementById('app-wrapper');
+        const btnLogout = document.getElementById('btn-logout');
+        const userDisplayName = document.getElementById('user-display-name');
+        
+        // Referencias al formulario de Login
+        const loginForm = document.getElementById('login-form');
+        const loginEmail = document.getElementById('login-email');
+        const loginPassword = document.getElementById('login-password');
+        const btnLogin = document.getElementById('btn-login');
+        const loginError = document.getElementById('login-error');
+
+        // Referencias a Paneles
+        const panelBusqueda = document.getElementById('panel-busqueda');
+        const panelRegistro = document.getElementById('panel-registro');
+        const panelEvaluacion = document.getElementById('panel-evaluacion');
+        
+        // Referencias de Búsqueda
+        const formBusqueda = document.getElementById('form-busqueda');
+        const inputBuscarGrupo = document.getElementById('buscar-grupo');
+        const inputBuscarNombre = document.getElementById('buscar-nombre');
+        const btnBuscar = document.getElementById('btn-buscar');
+        const btnIrARegistrar = document.getElementById('btn-ir-a-registrar');
+        const listaResultados = document.getElementById('lista-resultados');
+        
+        // Referencias de Registro
+        const formRegistro = document.getElementById('form-registro');
+        const inputRegGrupo = document.getElementById('reg-grupo');
+        const inputRegNombre = document.getElementById('reg-nombre');
+        const inputRegApellido = document.getElementById('reg-apellido');
+        const btnGuardarAlumno = document.getElementById('btn-guardar-alumno');
+        const btnCancelarRegistro = document.getElementById('btn-cancelar-registro');
+        
+        // Referencias de Evaluación
+        const btnVolverABusqueda = document.getElementById('btn-volver-a-busqueda');
+        const nombreAlumnoEvaluando = document.getElementById('nombre-alumno-evaluando');
+        const formRubrica = document.getElementById('rubrica-form');
+        const inputActividadNombre = document.getElementById('actividad-nombre');
+        const gridInvestigacion = document.getElementById('grid-investigacion');
+        const btnGuardarActividad = document.getElementById('btn-guardar-actividad');
         const concentradoOutput = document.getElementById('concentrado-output');
         const retroOutput = document.getElementById('retro-output');
-        
-        const grupoIdInput = document.getElementById('grupo-id');
-        const alumnoIdInput = document.getElementById('alumno-id');
-        const alumnoNombreInput = document.getElementById('alumno-nombre');
-        const actividadNombreInput = document.getElementById('actividad-nombre');
-        
-        const rubricaGrid = document.getElementById('grid-investigacion');
-        let valorSeleccionado = null; // Variable para guardar el botón seleccionado
 
-        // --- 5. LÓGICA DE INTERFAZ (UI) ---
-        
-        // Lógica para marcar el botón de rúbrica seleccionado
-        rubricaGrid.addEventListener('click', (e) => {
-          // Asegurarse de que se hizo clic en un botón
-          if (e.target.classList.contains('btn-nivel')) {
-            // Quitar 'active' de todos los botones hermanos
-            rubricaGrid.querySelectorAll('.btn-nivel').forEach(btn => btn.classList.remove('active'));
-            
-            // Añadir 'active' al botón clicado
-            e.target.classList.add('active');
-            
-            // Guardar el valor del botón (del atributo 'data-valor')
-            valorSeleccionado = e.target.dataset.valor;
-            console.log("Nivel seleccionado:", valorSeleccionado);
-          }
+
+        // --- 6. LÓGICA CENTRAL DE AUTENTICACIÓN ---
+
+        /**
+         * El "Guardián" de la aplicación.
+         */
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Usuario está LOGUEADO
+                loginContainer.style.display = 'none';
+                appWrapper.style.display = 'block';
+                userDisplayName.textContent = `Bienvenido, ${user.displayName || user.email}`; 
+                mostrarPanel('busqueda');
+                loginError.style.display = 'none';
+
+            } else {
+                // Usuario está NO LOGUEADO
+                loginContainer.style.display = 'block';
+                appWrapper.style.display = 'none';
+                alumnoActual = null;
+            }
         });
 
-        // --- 6. EVENT LISTENERS (Conectores) ---
-        
-        // Conectar el botón "Cargar Alumno" a la función
-        btnCargar.addEventListener('click', cargarDatosDelAlumno);
-
-        // Conectar el formulario "Guardar Actividad" a la función
-        form.addEventListener('submit', manejarGuardadoDeActividad);
-
-        // --- 7. FUNCIONES PRINCIPALES ---
-
         /**
-         * Maneja el envío del formulario para guardar una actividad.
+         * Inicia sesión con Email y Contraseña
          */
-        async function manejarGuardadoDeActividad(e) {
-            e.preventDefault(); // Evita que la página se recargue
+        async function signInWithEmail(e) {
+            e.preventDefault(); 
+            btnLogin.disabled = true;
+            btnLogin.textContent = "Ingresando...";
+            loginError.style.display = 'none';
 
-            // Recoger los datos de los inputs
-            const grupoId = grupoIdInput.value;
-            const alumnoId = alumnoIdInput.value;
-            const nombreActividad = actividadNombreInput.value;
-
-            // Validación simple
-            if (!grupoId || !alumnoId || !nombreActividad || !valorSeleccionado) {
-                alert("Por favor, completa todos los campos: IDs, nombre de actividad y selecciona un nivel de rúbrica.");
-                return;
+            try {
+                const email = loginEmail.value;
+                const password = loginPassword.value;
+                
+                await signInWithEmailAndPassword(auth, email, password);
+                // ¡Éxito! onAuthStateChanged se encargará del resto
+                
+            } catch (error) {
+                console.error("Error en inicio de sesión:", error.code);
+                if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                    loginError.textContent = "Usuario o contraseña incorrectos.";
+                } else if (error.code === 'auth/invalid-email') {
+                    loginError.textContent = "El formato del correo es incorrecto.";
+                } else {
+                    loginError.textContent = "Error al iniciar sesión.";
+                }
+                loginError.style.display = 'block';
             }
-
-            // Crear el objeto de datos para Firebase
-            const datosActividad = {
-                nombreActividad: nombreActividad,
-                nivelGeneral: valorSeleccionado,
-                // Aquí añadirías más rubros si los tuvieras
-                // rubricaCoherencia: "...",
-                // rubricaOrtografia: "..."
-            };
-
-            console.log("Guardando:", datosActividad);
             
-            // Llamar a la función de Firebase
-            await guardarActividad(grupoId, alumnoId, datosActividad);
-            
-            // Limpiar el formulario y recargar los datos
-            form.reset();
-            rubricaGrid.querySelectorAll('.btn-nivel').forEach(btn => btn.classList.remove('active'));
-            valorSeleccionado = null;
-            
-            // Recargar el concentrado para ver el cambio al instante
-            await cargarDatosDelAlumno();
+            btnLogin.disabled = false;
+            btnLogin.textContent = "Iniciar Sesión";
         }
 
         /**
-         * Orquesta la carga de datos del alumno y actualiza la UI.
+         * Cierra la sesión del usuario
          */
-        async function cargarDatosDelAlumno() {
-            const grupoId = grupoIdInput.value;
-            const alumnoId = alumnoIdInput.value;
-            const nombreAlumno = alumnoNombreInput.value;
+        async function logOut() {
+            try {
+                await signOut(auth);
+                console.log("¡Cierre de sesión exitoso!");
+            } catch (error) {
+                console.error("Error al cerrar sesión:", error);
+            }
+        }
 
-            if (!grupoId || !alumnoId) {
-                alert("Por favor, ingresa un ID de Grupo y Alumno.");
+        // --- 7. EVENT LISTENERS (Conectores) ---
+        
+        loginForm.addEventListener('submit', signInWithEmail);
+        btnLogout.addEventListener('click', logOut);
+
+        btnIrARegistrar.addEventListener('click', () => {
+            inputRegGrupo.value = inputBuscarGrupo.value; 
+            mostrarPanel('registro');
+        });
+        
+        formBusqueda.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const grupoId = inputBuscarGrupo.value.trim();
+            const nombreBusqueda = inputBuscarNombre.value.trim();
+            
+            if (!grupoId) {
+                alert("Por favor, ingresa un ID de Grupo para buscar.");
                 return;
             }
             
+            btnBuscar.disabled = true;
+            btnBuscar.textContent = "Buscando...";
+            await buscarAlumnos(grupoId, nombreBusqueda);
+            btnBuscar.disabled = false;
+            btnBuscar.textContent = "Buscar Alumnos";
+        });
+
+        formRegistro.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            btnGuardarAlumno.disabled = true;
+            btnGuardarAlumno.textContent = "Guardando...";
+            
+            const nuevoAlumno = {
+                nombre: inputRegNombre.value.trim(),
+                apellido: inputRegApellido.value.trim(),
+            };
+            const grupoId = inputRegGrupo.value.trim();
+            
+            const alumnoGuardado = await registrarNuevoAlumno(grupoId, nuevoAlumno);
+            
+            if (alumnoGuardado) {
+                const nombreCompleto = `${alumnoGuardado.nombre} ${alumnoGuardado.apellido || ''}`;
+                await cargarDatosDelAlumno(grupoId, alumnoGuardado.id, nombreCompleto);
+            }
+            
+            btnGuardarAlumno.disabled = false;
+            btnGuardarAlumno.textContent = "Guardar Alumno";
+            formRegistro.reset();
+        });
+
+        btnCancelarRegistro.addEventListener('click', () => mostrarPanel('busqueda'));
+
+        btnVolverABusqueda.addEventListener('click', () => {
+            alumnoActual = null; 
+            mostrarPanel('busqueda');
+        });
+
+        gridInvestigacion.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn-nivel')) {
+                gridInvestigacion.querySelectorAll('.btn-nivel').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                valorSeleccionado = e.target.dataset.valor;
+                actualizarEstadoBotonGuardar(); 
+            }
+        });
+        
+        inputActividadNombre.addEventListener('input', actualizarEstadoBotonGuardar);
+
+        formRubrica.addEventListener('submit', manejarGuardadoDeActividad);
+
+
+        // --- 8. FUNCIONES DE GESTIÓN DE PANELES (UI) ---
+
+        /**
+         * Muestra un panel específico y oculta los demás
+         */
+        function mostrarPanel(panelId) {
+            panelBusqueda.classList.remove('activo');
+            panelRegistro.classList.remove('activo');
+            panelEvaluacion.classList.remove('activo');
+
+            if (panelId === 'busqueda') {
+                panelBusqueda.classList.add('activo');
+            } else if (panelId === 'registro') {
+                panelRegistro.classList.add('activo');
+            } else if (panelId === 'evaluacion') {
+                panelEvaluacion.classList.add('activo');
+            }
+        }
+
+        /**
+         * Habilita o deshabilita el botón de guardar actividad
+         */
+        function actualizarEstadoBotonGuardar() {
+            if (alumnoActual && valorSeleccionado && inputActividadNombre.value.trim() !== '' && !estaGuardando) {
+                btnGuardarActividad.disabled = false;
+            } else {
+                btnGuardarActividad.disabled = true;
+            }
+        }
+
+        
+        // --- 9. FUNCIONES PRINCIPALES (Lógica de App y Firebase) ---
+
+        /**
+         * Busca alumnos en Firebase por grupo y nombre
+         */
+        async function buscarAlumnos(grupoId, nombreBusqueda) {
+            listaResultados.innerHTML = '<li>Cargando...</li>';
+            
+            const rutaAlumnos = collection(db, 'grupos', grupoId, 'alumnos');
+            let q;
+
+            if (nombreBusqueda) {
+                const fin = nombreBusqueda.replace(/.$/, c => String.fromCharCode(c.charCodeAt(0) + 1));
+                q = query(rutaAlumnos, 
+                          where('nombre', '>=', nombreBusqueda), 
+                          where('nombre', '<', fin),
+                          orderBy('nombre'));
+            } else {
+                q = query(rutaAlumnos, orderBy('nombre'));
+            }
+
+            try {
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) {
+                    listaResultados.innerHTML = '<li>No se encontraron alumnos.</li>';
+                    return;
+                }
+                
+                listaResultados.innerHTML = ''; 
+                querySnapshot.forEach((doc) => {
+                    const alumno = { id: doc.id, ...doc.data() };
+                    const item = document.createElement('li');
+                    item.innerHTML = `<span>${alumno.nombre} ${alumno.apellido || ''}</span> <br> <small>ID: ${alumno.id}</small>`;
+                    item.addEventListener('click', () => {
+                        const nombreCompleto = `${alumno.nombre} ${alumno.apellido || ''}`;
+                        cargarDatosDelAlumno(grupoId, alumno.id, nombreCompleto);
+                    });
+                    listaResultados.appendChild(item);
+                });
+
+            } catch (error) {
+                console.error("Error al buscar alumnos: ", error);
+                listaResultados.innerHTML = '<li>Error al cargar alumnos. Revisa las reglas.</li>';
+            }
+        }
+        
+        /**
+         * Registra un nuevo alumno en la base de datos
+         */
+        async function registrarNuevoAlumno(grupoId, datosAlumno) {
+            if (!grupoId || !datosAlumno.nombre || !datosAlumno.apellido) {
+                alert("Se requiere Grupo, Nombre y Apellido.");
+                return null;
+            }
+            try {
+                const rutaColeccion = collection(db, 'grupos', grupoId, 'alumnos');
+                const docRef = await addDoc(rutaColeccion, datosAlumno);
+                alert("¡Alumno registrado con éxito!");
+                return { id: docRef.id, ...datosAlumno };
+            } catch (error) {
+                console.error("Error al registrar alumno: ", error);
+                alert("Error al registrar. Revisa la consola.");
+                return null;
+            }
+        }
+
+        /**
+         * Orquesta la carga de datos del alumno y actualiza la UI
+         */
+        async function cargarDatosDelAlumno(grupoId, alumnoId, nombreCompleto) {
+            alumnoActual = { id: alumnoId, grupoId: grupoId, nombre: nombreCompleto };
+            nombreAlumnoEvaluando.textContent = nombreCompleto;
             concentradoOutput.textContent = "Cargando actividades...";
             retroOutput.textContent = "Cargando retroalimentación...";
-            
-            // 1. Obtener los datos de Firebase
-            const concentrado = await obtenerConcentrado(grupoId, alumnoId);
-            
-            // 2. Mostrar el concentrado en la UI
+            mostrarPanel('evaluacion'); 
+            actualizarEstadoBotonGuardar(); 
+            const concentrado = await obtenerConcentrado(alumnoActual.grupoId, alumnoActual.id);
             mostrarConcentradoEnUI(concentrado);
-            
-            // 3. Generar y mostrar la retroalimentación
-            generarRetroalimentacion(concentrado, nombreAlumno);
+            generarRetroalimentacion(concentrado, alumnoActual.nombre);
         }
 
         /**
-         * Muestra el concentrado de actividades en el <pre>
+         * Maneja el envío del formulario de actividad
+         */
+        async function manejarGuardadoDeActividad(e) {
+            e.preventDefault(); 
+            if (!alumnoActual || !valorSeleccionado || estaGuardando) return;
+            
+            estaGuardando = true;
+            btnGuardarActividad.disabled = true;
+            btnGuardarActividad.textContent = "Guardando...";
+            
+            const datosActividad = {
+                nombreActividad: inputActividadNombre.value.trim(),
+                nivelGeneral: valorSeleccionado,
+            };
+            
+            await guardarActividad(alumnoActual.grupoId, alumnoActual.id, datosActividad);
+            
+            estaGuardando = false;
+            btnGuardarActividad.textContent = "Guardar Actividad";
+            formRubrica.reset();
+            gridInvestigacion.querySelectorAll('.btn-nivel').forEach(btn => btn.classList.remove('active'));
+            valorSeleccionado = null;
+            actualizarEstadoBotonGuardar();
+            
+            await cargarDatosDelAlumno(alumnoActual.grupoId, alumnoActual.id, alumnoActual.nombre);
+        }
+
+        /**
+         * Muestra el concentrado de actividades
          */
         function mostrarConcentradoEnUI(actividades) {
             if (actividades.length === 0) {
                 concentradoOutput.textContent = "Este alumno aún no tiene actividades registradas.";
                 return;
             }
-            
-            let texto = `Total de actividades: ${actividades.length}\n`;
-            texto += "---------------------------------\n";
-            
+            let texto = `Total de actividades: ${actividades.length}\n---------------------------------\n`;
             actividades.forEach(act => {
-                // 'fechaCreacion' es un objeto Timestamp de Firebase, lo convertimos a fecha
                 const fecha = act.fechaCreacion ? act.fechaCreacion.toDate().toLocaleDateString() : 'Sin fecha';
                 texto += `[${fecha}] ${act.nombreActividad} - Nivel: ${act.nivelGeneral}\n`;
             });
-            
             concentradoOutput.textContent = texto;
         }
         
         /**
-         * Genera y muestra la retroalimentación personalizada.
+         * Genera y muestra la retroalimentación
          */
         function generarRetroalimentacion(actividades, nombreAlumno) {
             if (actividades.length === 0) {
                 retroOutput.textContent = "No hay suficientes datos para generar una retroalimentación.";
                 return;
             }
-
-            // Contar los niveles
-            let conteo = {
-                "Excelente": 0,
-                "Satisfactorio": 0,
-                "Suficiente": 0,
-                "Insatisfactorio": 0,
-            };
-
+            let conteo = {"Excelente": 0, "Satisfactorio": 0, "Suficiente": 0, "Insatisfactorio": 0,};
             actividades.forEach(act => {
                 if (conteo.hasOwnProperty(act.nivelGeneral)) {
                     conteo[act.nivelGeneral]++;
                 }
             });
-
-            // Generar el texto
+            
             let retro = `¡Hola ${nombreAlumno}!\n\n`;
             retro += `He revisado tus ${actividades.length} actividades más recientes y este es tu resumen:\n`;
             retro += `- Nivel Excelente: ${conteo.Excelente}\n`;
@@ -422,26 +768,18 @@
             } else {
                 retro += "He notado que algunas áreas necesitan más atención. Por favor, acércate para que podamos revisarlas juntos.\n";
             }
-
             retroOutput.textContent = retro;
         }
 
-
-        // --- 8. FUNCIONES DE FIREBASE (Núcleo v9) ---
-
         /**
-         * (v9) Guarda una nueva actividad para un alumno específico.
+         * Guarda una nueva actividad en Firebase
          */
         async function guardarActividad(grupoId, alumnoId, datosActividad) {
             const rutaColeccion = collection(db, 'grupos', grupoId, 'alumnos', alumnoId, 'actividades');
             try {
-                const datosCompletos = {
-                    ...datosActividad,
-                    fechaCreacion: serverTimestamp() // Añade la fecha del servidor
-                };
-                const docRef = await addDoc(rutaColeccion, datosCompletos);
-                console.log("¡Actividad guardada con éxito! ID:", docRef.id);
-                alert("¡Evaluación guardada!");
+                const datosCompletos = { ...datosActividad, fechaCreacion: serverTimestamp() };
+                await addDoc(rutaColeccion, datosCompletos);
+                console.log("¡Actividad guardada!");
             } catch (error) {
                 console.error("Error al guardar: ", error);
                 alert("Error al guardar. Revisa la consola.");
@@ -449,29 +787,24 @@
         }
 
         /**
-         * (v9) Obtiene todas las actividades de un alumno.
+         * Obtiene todas las actividades de un alumno
          */
         async function obtenerConcentrado(grupoId, alumnoId) {
             const rutaColeccion = collection(db, 'grupos', grupoId, 'alumnos', alumnoId, 'actividades');
-            const q = query(rutaColeccion, orderBy('fechaCreacion', 'desc')); // Ordenar por fecha
-
+            const q = query(rutaColeccion, orderBy('fechaCreacion', 'desc')); 
             try {
                 const querySnapshot = await getDocs(q);
                 let actividades = [];
                 querySnapshot.forEach((doc) => {
-                    actividades.push({
-                        id: doc.id,
-                        ...doc.data()
-                    });
+                    actividades.push({ id: doc.id, ...doc.data() });
                 });
-                console.log("Actividades recuperadas:", actividades);
                 return actividades;
             } catch (error) {
                 console.error("Error al obtener datos: ", error);
-                return []; // Devuelve vacío en caso de error
+                return []; 
             }
         }
-
+        
     </script>
 </body>
 </html>
